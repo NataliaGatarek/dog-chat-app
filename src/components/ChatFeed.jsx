@@ -7,7 +7,23 @@ import OtherMessage from "./OtherMessage";
 function ChatFeed(props) {
   const { chats, activeChat, userName, messages } = props;
 
-  const chat = chat && chats[activeChat]; //looking for active chats
+  const chat = chats && chats[activeChat]; //looking for active chats
+
+  const renderReadReceipts = (message, isMyMessage) => {
+    chat.people.map(
+      (person, index) =>
+        person.last_read === message.id && (
+          <div
+            key={`read_${index}`}
+            className="read-receipt"
+            style={{
+              float: isMyMessage ? "right" : "left",
+              backgroundImage: `url(${person?.person?.avatar})`,
+            }}
+          />
+        )
+    ); //person red the message
+  };
 
   const renderMessages = () => {
     const keys = Object.keys(messages);
@@ -20,7 +36,14 @@ function ChatFeed(props) {
       return (
         <div key={`msg_${index}`} style={{ width: "100%" }}>
           <div className="message-block">
-            {isMyMessage ? <MyMessage /> : <OtherMessage />}
+            {isMyMessage ? (
+              <MyMessage message={message} />
+            ) : (
+              <OtherMessage
+                message={message}
+                lastMessage={messages[lastMessageKey]}
+              />
+            )}
           </div>
           <div
             className="read-receipts"
@@ -29,7 +52,7 @@ function ChatFeed(props) {
               marginLeft: isMyMessage ? "0px" : "68px",
             }}
           >
-            read-receipts
+            {renderReadReceipts(message, isMyMessage)}
           </div>
         </div>
       );
